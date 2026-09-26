@@ -1,0 +1,534 @@
+<div class="card shadow-2 border-round-xl">
+    <h3 class="mb-3">Gestion des Revenus Iqraa</h3>
+
+    <!-- Messages d'erreur et succès -->
+    <div *ngIf="errorMessage" class="message-toast error-message">
+        {{ errorMessage }}
+    </div>
+    <div *ngIf="successMessage" class="message-toast success-message">
+        {{ successMessage }}
+    </div>
+
+    <!-- ================= SECTION IQRAA 1 ================= -->
+    <div class="section-header">
+        <h2>École Iqraa 1</h2>
+    </div>
+
+    <div class="grid-layout">
+        <!-- Revenus Espèces Iqraa 1 -->
+        <div class="col-section">
+            <div class="p-toolbar mb-3">
+                <div class="toolbar-left">
+                    <h4>Revenus Espèces</h4>
+                </div>
+                <div class="toolbar-right">
+                    <button class="btn btn-success" (click)="ajouterEspeceIqraa1()">
+                        <i class="pi pi-plus"></i> {{ nouveauEspece1.id ? 'Modifier' : 'Ajouter' }}
+                    </button>
+                    <button class="btn btn-danger ms-2"
+                            (click)="supprimerEspecesSelectionnees(1)"
+                            [disabled]="selectedEspeces1.length === 0">
+                        <i class="pi pi-trash"></i> Supprimer
+                    </button>
+                    <button class="btn btn-secondary ms-2" (click)="imprimerEspeces1()">
+                        <i class="pi pi-print"></i> Imprimer
+                    </button>
+                </div>
+            </div>
+
+            <div class="card section-especes">
+                <div class="table-caption">
+                    <span class="title">Liste des revenus espèces</span>
+                    <div class="search-wrapper">
+                        <i class="pi pi-search"></i>
+                        <input type="text"
+                               class="search-input"
+                               placeholder="Rechercher..."
+                               [(ngModel)]="searchEspece1"
+                               (keyup)="rechercherEspeces1()">
+                    </div>
+                </div>
+
+                <table class="data-table">
+                    <thead>
+                    <tr>
+                        <th style="width: 40px">
+                            <input type="checkbox"
+                                   (change)="toggleAllEspeces1($any($event.target).checked)">
+                        </th>
+                        <th>Montant (DH)</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr *ngFor="let espece of paginatedEspecesIqraa1; trackBy: trackByFn">
+                        <td>
+                            <input type="checkbox"
+                                   [checked]="selectedEspeces1.includes(espece.id!)"
+                                   (change)="toggleSelection(espece.id!, selectedEspeces1)">
+                        </td>
+                        <td>{{ espece.montant | number:'1.2-2' }}</td>
+                        <td>{{ formatDate(espece.date) }}</td>
+                        <td>
+                            <button class="btn btn-warning me-2" (click)="editerEspece(espece, 1)">
+                                <i class="pi pi-pencil"></i>
+                            </button>
+                            <button class="btn btn-danger" (click)="supprimerEspece(espece.id!, 1)">
+                                <i class="pi pi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr *ngIf="paginatedEspecesIqraa1.length === 0">
+                        <td colspan="4" style="text-align: center; color: #6c757d;">
+                            Aucun revenu espèce
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <!-- Pagination Espèces 1 -->
+                <div class="pagination-wrapper" *ngIf="totalPagesEspece1 > 1">
+                    <button class="pagination-btn"
+                            (click)="goToPageEspece1(currentPageEspece1 - 1)"
+                            [disabled]="currentPageEspece1 === 1">
+                        <i class="pi pi-chevron-left"></i>
+                    </button>
+
+                    <button *ngFor="let page of getPageNumbers(totalPagesEspece1)"
+                            class="pagination-btn"
+                            [class.active]="page === currentPageEspece1"
+                            (click)="goToPageEspece1(page)">
+                        {{ page }}
+                    </button>
+
+                    <button class="pagination-btn"
+                            (click)="goToPageEspece1(currentPageEspece1 + 1)"
+                            [disabled]="currentPageEspece1 === totalPagesEspece1">
+                        <i class="pi pi-chevron-right"></i>
+                    </button>
+                </div>
+
+                <div class="form-section mt-3">
+                    <div class="form-inline">
+                        <input type="number"
+                               [(ngModel)]="nouveauEspece1.montant"
+                               class="form-input"
+                               placeholder="Montant"
+                               min="0"
+                               step="0.01"
+                               [disabled]="loadingEspece1">
+                        <button class="btn btn-success"
+                                (click)="ajouterEspeceIqraa1()"
+                                [disabled]="loadingEspece1">
+                            {{ loadingEspece1 ? 'Enregistrement...' : (nouveauEspece1.id ? 'Modifier' : 'Ajouter') }}
+                        </button>
+                    </div>
+                    <p class="total-display">Total: <span>{{ totalEspece1 | number:'1.2-2' }}</span> DH</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Revenus Comptes Iqraa 1 -->
+        <div class="col-section">
+            <div class="p-toolbar mb-3">
+                <div class="toolbar-left">
+                    <h4>Revenus Compte</h4>
+                </div>
+                <div class="toolbar-right">
+                    <button class="btn btn-success" (click)="ajouterCompteIqraa1()">
+                        <i class="pi pi-plus"></i> {{ nouveauCompte1.id ? 'Modifier' : 'Ajouter' }}
+                    </button>
+                    <button class="btn btn-danger ms-2"
+                            (click)="supprimerComptesSelectionnes(1)"
+                            [disabled]="selectedComptes1.length === 0">
+                        <i class="pi pi-trash"></i> Supprimer
+                    </button>
+                    <button class="btn btn-secondary ms-2" (click)="imprimerComptes1()">
+                        <i class="pi pi-print"></i> Imprimer
+                    </button>
+                </div>
+            </div>
+
+            <div class="card section-comptes">
+                <div class="table-caption">
+                    <span class="title">Liste des revenus compte</span>
+                    <div class="search-wrapper">
+                        <i class="pi pi-search"></i>
+                        <input type="text"
+                               class="search-input"
+                               placeholder="Rechercher..."
+                               [(ngModel)]="searchCompte1"
+                               (keyup)="rechercherComptes1()">
+                    </div>
+                </div>
+
+                <table class="data-table">
+                    <thead>
+                    <tr>
+                        <th style="width: 40px">
+                            <input type="checkbox"
+                                   (change)="toggleAllComptes1($any($event.target).checked)">
+                        </th>
+                        <th>Nom</th>
+                        <th>Montant</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr *ngFor="let compte of paginatedComptesIqraa1; trackBy: trackByFn">
+                        <td>
+                            <input type="checkbox"
+                                   [checked]="selectedComptes1.includes(compte.id!)"
+                                   (change)="toggleSelection(compte.id!, selectedComptes1)">
+                        </td>
+                        <td>{{ compte.nomPersonne }}</td>
+                        <td>{{ compte.montant | number:'1.2-2' }}</td>
+                        <td>{{ formatDate(compte.date) }}</td>
+                        <td>
+                            <button class="btn btn-warning me-2" (click)="editerCompte(compte, 1)">
+                                <i class="pi pi-pencil"></i>
+                            </button>
+                            <button class="btn btn-danger" (click)="supprimerCompte(compte.id!, 1)">
+                                <i class="pi pi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr *ngIf="paginatedComptesIqraa1.length === 0">
+                        <td colspan="5" style="text-align: center; color: #6c757d;">
+                            Aucun revenu compte
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <!-- Pagination Comptes 1 -->
+                <div class="pagination-wrapper" *ngIf="totalPagesCompte1 > 1">
+                    <button class="pagination-btn"
+                            (click)="goToPageCompte1(currentPageCompte1 - 1)"
+                            [disabled]="currentPageCompte1 === 1">
+                        <i class="pi pi-chevron-left"></i>
+                    </button>
+
+                    <button *ngFor="let page of getPageNumbers(totalPagesCompte1)"
+                            class="pagination-btn"
+                            [class.active]="page === currentPageCompte1"
+                            (click)="goToPageCompte1(page)">
+                        {{ page }}
+                    </button>
+
+                    <button class="pagination-btn"
+                            (click)="goToPageCompte1(currentPageCompte1 + 1)"
+                            [disabled]="currentPageCompte1 === totalPagesCompte1">
+                        <i class="pi pi-chevron-right"></i>
+                    </button>
+                </div>
+
+                <div class="form-section mt-3">
+                    <div class="form-grid-compact">
+                        <input type="text"
+                               [(ngModel)]="nouveauCompte1.nomPersonne"
+                               class="form-input"
+                               placeholder="Nom"
+                               [disabled]="loadingCompte1">
+                        <input type="number"
+                               [(ngModel)]="nouveauCompte1.montant"
+                               class="form-input"
+                               placeholder="Montant"
+                               min="0"
+                               step="0.01"
+                               [disabled]="loadingCompte1">
+                        <input type="date"
+                               [ngModel]="nouveauCompte1.date"
+                               (ngModelChange)="nouveauCompte1.date = $event"
+                               class="form-input"
+                               [disabled]="loadingCompte1">
+                        <button class="btn btn-success"
+                                (click)="ajouterCompteIqraa1()"
+                                [disabled]="loadingCompte1">
+                            {{ loadingCompte1 ? 'Enregistrement...' : (nouveauCompte1.id ? 'Modifier' : 'Ajouter') }}
+                        </button>
+                    </div>
+                    <p class="total-display">Total: <span>{{ totalCompte1 | number:'1.2-2' }}</span> DH</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= SECTION IQRAA 2 ================= -->
+    <div class="section-header mt-5">
+        <h2>École Iqraa 2</h2>
+    </div>
+
+    <div class="grid-layout">
+        <!-- Revenus Espèces Iqraa 2 -->
+        <div class="col-section">
+            <div class="p-toolbar mb-3">
+                <div class="toolbar-left">
+                    <h4>Revenus Espèces</h4>
+                </div>
+                <div class="toolbar-right">
+                    <button class="btn btn-success" (click)="ajouterEspeceIqraa2()">
+                        <i class="pi pi-plus"></i> {{ nouveauEspece2.id ? 'Modifier' : 'Ajouter' }}
+                    </button>
+                    <button class="btn btn-danger ms-2"
+                            (click)="supprimerEspecesSelectionnees(2)"
+                            [disabled]="selectedEspeces2.length === 0">
+                        <i class="pi pi-trash"></i> Supprimer
+                    </button>
+                    <button class="btn btn-secondary ms-2" (click)="imprimerEspeces2()">
+                        <i class="pi pi-print"></i> Imprimer
+                    </button>
+                </div>
+            </div>
+
+            <div class="card section-especes">
+                <div class="table-caption">
+                    <span class="title">Liste des revenus espèces</span>
+                    <div class="search-wrapper">
+                        <i class="pi pi-search"></i>
+                        <input type="text"
+                               class="search-input"
+                               placeholder="Rechercher..."
+                               [(ngModel)]="searchEspece2"
+                               (keyup)="rechercherEspeces2()">
+                    </div>
+                </div>
+
+                <table class="data-table">
+                    <thead>
+                    <tr>
+                        <th style="width: 40px">
+                            <input type="checkbox"
+                                   (change)="toggleAllEspeces2($any($event.target).checked)">
+                        </th>
+                        <th>Montant (DH)</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr *ngFor="let espece of paginatedEspecesIqraa2; trackBy: trackByFn">
+                        <td>
+                            <input type="checkbox"
+                                   [checked]="selectedEspeces2.includes(espece.id!)"
+                                   (change)="toggleSelection(espece.id!, selectedEspeces2)">
+                        </td>
+                        <td>{{ espece.montant | number:'1.2-2' }}</td>
+                        <td>{{ formatDate(espece.date) }}</td>
+                        <td>
+                            <button class="btn btn-warning me-2" (click)="editerEspece(espece, 2)">
+                                <i class="pi pi-pencil"></i>
+                            </button>
+                            <button class="btn btn-danger" (click)="supprimerEspece(espece.id!, 2)">
+                                <i class="pi pi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr *ngIf="paginatedEspecesIqraa2.length === 0">
+                        <td colspan="4" style="text-align: center; color: #6c757d;">
+                            Aucun revenu espèce
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <!-- Pagination Espèces 2 -->
+                <div class="pagination-wrapper" *ngIf="totalPagesEspece2 > 1">
+                    <button class="pagination-btn"
+                            (click)="goToPageEspece2(currentPageEspece2 - 1)"
+                            [disabled]="currentPageEspece2 === 1">
+                        <i class="pi pi-chevron-left"></i>
+                    </button>
+
+                    <button *ngFor="let page of getPageNumbers(totalPagesEspece2)"
+                            class="pagination-btn"
+                            [class.active]="page === currentPageEspece2"
+                            (click)="goToPageEspece2(page)">
+                        {{ page }}
+                    </button>
+
+                    <button class="pagination-btn"
+                            (click)="goToPageEspece2(currentPageEspece2 + 1)"
+                            [disabled]="currentPageEspece2 === totalPagesEspece2">
+                        <i class="pi pi-chevron-right"></i>
+                    </button>
+                </div>
+
+                <div class="form-section mt-3">
+                    <div class="form-inline">
+                        <input type="number"
+                               [(ngModel)]="nouveauEspece2.montant"
+                               class="form-input"
+                               placeholder="Montant"
+                               min="0"
+                               step="0.01"
+                               [disabled]="loadingEspece2">
+                        <button class="btn btn-success"
+                                (click)="ajouterEspeceIqraa2()"
+                                [disabled]="loadingEspece2">
+                            {{ loadingEspece2 ? 'Enregistrement...' : (nouveauEspece2.id ? 'Modifier' : 'Ajouter') }}
+                        </button>
+                    </div>
+                    <p class="total-display">Total: <span>{{ totalEspece2 | number:'1.2-2' }}</span> DH</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Revenus Comptes Iqraa 2 -->
+        <div class="col-section">
+            <div class="p-toolbar mb-3">
+                <div class="toolbar-left">
+                    <h4>Revenus Compte</h4>
+                </div>
+                <div class="toolbar-right">
+                    <button class="btn btn-success" (click)="ajouterCompteIqraa2()">
+                        <i class="pi pi-plus"></i> {{ nouveauCompte2.id ? 'Modifier' : 'Ajouter' }}
+                    </button>
+                    <button class="btn btn-danger ms-2"
+                            (click)="supprimerComptesSelectionnes(2)"
+                            [disabled]="selectedComptes2.length === 0">
+                        <i class="pi pi-trash"></i> Supprimer
+                    </button>
+                    <button class="btn btn-secondary ms-2" (click)="imprimerComptes2()">
+                        <i class="pi pi-print"></i> Imprimer
+                    </button>
+                </div>
+            </div>
+
+            <div class="card section-comptes">
+                <div class="table-caption">
+                    <span class="title">Liste des revenus compte</span>
+                    <div class="search-wrapper">
+                        <i class="pi pi-search"></i>
+                        <input type="text"
+                               class="search-input"
+                               placeholder="Rechercher..."
+                               [(ngModel)]="searchCompte2"
+                               (keyup)="rechercherComptes2()">
+                    </div>
+                </div>
+
+                <table class="data-table">
+                    <thead>
+                    <tr>
+                        <th style="width: 40px">
+                            <input type="checkbox"
+                                   (change)="toggleAllComptes2($any($event.target).checked)">
+                        </th>
+                        <th>Nom</th>
+                        <th>Montant</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr *ngFor="let compte of paginatedComptesIqraa2; trackBy: trackByFn">
+                        <td>
+                            <input type="checkbox"
+                                   [checked]="selectedComptes2.includes(compte.id!)"
+                                   (change)="toggleSelection(compte.id!, selectedComptes2)">
+                        </td>
+                        <td>{{ compte.nomPersonne }}</td>
+                        <td>{{ compte.montant | number:'1.2-2' }}</td>
+                        <td>{{ formatDate(compte.date) }}</td>
+                        <td>
+                            <button class="btn btn-warning me-2" (click)="editerCompte(compte, 2)">
+                                <i class="pi pi-pencil"></i>
+                            </button>
+                            <button class="btn btn-danger" (click)="supprimerCompte(compte.id!, 2)">
+                                <i class="pi pi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr *ngIf="paginatedComptesIqraa2.length === 0">
+                        <td colspan="5" style="text-align: center; color: #6c757d;">
+                            Aucun revenu compte
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <!-- Pagination Comptes 2 -->
+                <div class="pagination-wrapper" *ngIf="totalPagesCompte2 > 1">
+                    <button class="pagination-btn"
+                            (click)="goToPageCompte2(currentPageCompte2 - 1)"
+                            [disabled]="currentPageCompte2 === 1">
+                        <i class="pi pi-chevron-left"></i>
+                    </button>
+
+                    <button *ngFor="let page of getPageNumbers(totalPagesCompte2)"
+                            class="pagination-btn"
+                            [class.active]="page === currentPageCompte2"
+                            (click)="goToPageCompte2(page)">
+                        {{ page }}
+                    </button>
+
+                    <button class="pagination-btn"
+                            (click)="goToPageCompte2(currentPageCompte2 + 1)"
+                            [disabled]="currentPageCompte2 === totalPagesCompte2">
+                        <i class="pi pi-chevron-right"></i>
+                    </button>
+                </div>
+
+                <div class="form-section mt-3">
+                    <div class="form-grid-compact">
+                        <input type="text"
+                               [(ngModel)]="nouveauCompte2.nomPersonne"
+                               class="form-input"
+                               placeholder="Nom"
+                               [disabled]="loadingCompte2">
+                        <input type="number"
+                               [(ngModel)]="nouveauCompte2.montant"
+                               class="form-input"
+                               placeholder="Montant"
+                               min="0"
+                               step="0.01"
+                               [disabled]="loadingCompte2">
+                        <input type="date"
+                               [ngModel]="nouveauCompte2.date"
+                               (ngModelChange)="nouveauCompte2.date = $event"
+                               class="form-input"
+                               [disabled]="loadingCompte2">
+                        <button class="btn btn-success"
+                                (click)="ajouterCompteIqraa2()"
+                                [disabled]="loadingCompte2">
+                            {{ loadingCompte2 ? 'Enregistrement...' : (nouveauCompte2.id ? 'Modifier' : 'Ajouter') }}
+                        </button>
+                    </div>
+                    <p class="total-display">Total: <span>{{ totalCompte2 | number:'1.2-2' }}</span> DH</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= TOTAUX GÉNÉRAUX ================= -->
+    <div class="total-section">
+        <h3>Totaux Généraux</h3>
+        <div class="totals-grid">
+            <div class="total-item">
+                <span class="total-label">Espèces Iqraa 1:</span>
+                <span class="total-value">{{ totalEspece1 | number:'1.2-2' }} DH</span>
+            </div>
+            <div class="total-item">
+                <span class="total-label">Comptes Iqraa 1:</span>
+                <span class="total-value">{{ totalCompte1 | number:'1.2-2' }} DH</span>
+            </div>
+            <div class="total-item">
+                <span class="total-label">Espèces Iqraa 2:</span>
+                <span class="total-value">{{ totalEspece2 | number:'1.2-2' }} DH</span>
+            </div>
+            <div class="total-item">
+                <span class="total-label">Comptes Iqraa 2:</span>
+                <span class="total-value">{{ totalCompte2 | number:'1.2-2' }} DH</span>
+            </div>
+            <div class="total-item total-global">
+                <span class="total-label">TOTAL GLOBAL:</span>
+                <span class="total-value">
+          {{ (totalEspece1 + totalEspece2 + totalCompte1 + totalCompte2) | number:'1.2-2' }} DH
+        </span>
+            </div>
+        </div>
+    </div>
+</div>

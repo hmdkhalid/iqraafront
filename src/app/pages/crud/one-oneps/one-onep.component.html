@@ -1,0 +1,338 @@
+<div class="card p-4 shadow-2 surface-card border-round-xl">
+    <h3 class="mb-3">Gestion des ONE et ONEP</h3>
+
+    <!-- SECTION ONE -->
+    <p-toolbar class="mb-3">
+        <ng-template pTemplate="left">
+            <h4 class="m-0">Liste ONE</h4>
+        </ng-template>
+        <ng-template pTemplate="right">
+            <button pButton icon="pi pi-plus" class="p-button-success" label="Ajouter ONE" (click)="ouvrirAjouterOne()"></button>
+            <button pButton icon="pi pi-print" class="p-button-info ms-2" label="Imprimer" (click)="imprimerTableau('one')"></button>
+            <button pButton icon="pi pi-trash" class="p-button-danger ms-2" label="Supprimer"
+                    [disabled]="!selectedOnes.length"
+                    (click)="supprimerOnesSelectionnes()"></button>
+        </ng-template>
+    </p-toolbar>
+
+    <div class="mb-3">
+        <label>Total ONE :</label>
+        <input type="number" pInputText [value]="totalOne" disabled />
+    </div>
+
+    <p-table #dtOne [value]="ones" [(selection)]="selectedOnes"
+             dataKey="id" [paginator]="true" [rows]="5" [rowsPerPageOptions]="[5,10,20]"
+             [responsiveLayout]="'scroll'" [globalFilterFields]="['nom', 'numero']" selectionMode="multiple">
+
+        <ng-template pTemplate="caption">
+            <div class="caption-container">
+                <span class="text-lg font-semibold">Liste des ONE</span>
+                <span class="p-input-icon-left search-wrapper">
+                    <i class="pi pi-search"></i>
+                    <input pInputText type="text" placeholder="Rechercher..." (input)="onGlobalFilterOne($event)" style="width:200px" />
+                </span>
+            </div>
+        </ng-template>
+
+        <ng-template pTemplate="header">
+            <tr>
+                <th style="width:3rem"><p-tableHeaderCheckbox></p-tableHeaderCheckbox></th>
+                <th>Nom</th>
+                <th>Numéro</th>
+                <th>Total</th>
+                <th>Actions</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-o>
+            <tr>
+                <td><p-tableCheckbox [value]="o"></p-tableCheckbox></td>
+                <td>{{ o.nom }}</td>
+                <td>{{ o.numero }}</td>
+                <td>{{ getTotalPaiements(o.paiements) }}</td>
+                <td>
+                    <button pButton icon="pi pi-pencil" class="p-button-rounded p-button-warning me-2"
+                            (click)="ouvrirModifierOne(o)"></button>
+                    <button pButton icon="pi pi-trash" class="p-button-rounded p-button-danger"
+                            (click)="supprimerOne(o.id, o.nom)"></button>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+
+    <!-- Tableau caché pour l'impression ONE -->
+    <div id="table-one" style="display: none;">
+        <table>
+            <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Numéro</th>
+                <th>Total</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let o of ones">
+                <td>{{ o.nom }}</td>
+                <td>{{ o.numero }}</td>
+                <td>{{ getTotalPaiements(o.paiements) }}</td>
+            </tr>
+            </tbody>
+            <tfoot>
+            <tr>
+                <td colspan="2"><strong>Total général</strong></td>
+                <td><strong>{{ totalOne }}</strong></td>
+            </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <!-- SECTION ONEP -->
+    <p-toolbar class="mt-5 mb-3">
+        <ng-template pTemplate="left">
+            <h4 class="m-0">Liste ONEP</h4>
+        </ng-template>
+        <ng-template pTemplate="right">
+            <button pButton icon="pi pi-plus" class="p-button-success" label="Ajouter ONEP" (click)="ouvrirAjouterOnep()"></button>
+            <button pButton icon="pi pi-print" class="p-button-info ms-2" label="Imprimer" (click)="imprimerTableau('onep')"></button>
+            <button pButton icon="pi pi-trash" class="p-button-danger ms-2" label="Supprimer"
+                    [disabled]="!selectedOneps.length"
+                    (click)="supprimerOnepsSelectionnes()"></button>
+        </ng-template>
+    </p-toolbar>
+
+    <div class="mb-3">
+        <label>Total ONEP :</label>
+        <input type="number" pInputText [value]="totalOnep" disabled />
+    </div>
+
+    <p-table #dtOnep [value]="oneps" [(selection)]="selectedOneps"
+             dataKey="id" [paginator]="true" [rows]="5" [rowsPerPageOptions]="[5,10,20]"
+             [responsiveLayout]="'scroll'" [globalFilterFields]="['nom', 'numero']" selectionMode="multiple">
+
+        <ng-template pTemplate="caption">
+            <div class="caption-container">
+                <span class="text-lg font-semibold">Liste des ONEP</span>
+                <span class="p-input-icon-left search-wrapper">
+                    <i class="pi pi-search"></i>
+                    <input pInputText type="text" placeholder="Rechercher..." (input)="onGlobalFilterOnep($event)" style="width:200px" />
+                </span>
+            </div>
+        </ng-template>
+
+        <ng-template pTemplate="header">
+            <tr>
+                <th style="width:3rem"><p-tableHeaderCheckbox></p-tableHeaderCheckbox></th>
+                <th>Nom</th>
+                <th>Numéro</th>
+                <th>Total</th>
+                <th>Actions</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-o>
+            <tr>
+                <td><p-tableCheckbox [value]="o"></p-tableCheckbox></td>
+                <td>{{ o.nom }}</td>
+                <td>{{ o.numero }}</td>
+                <td>{{ getTotalPaiements(o.paiements) }}</td>
+                <td>
+                    <button pButton icon="pi pi-pencil" class="p-button-rounded p-button-warning me-2"
+                            (click)="ouvrirModifierOnep(o)"></button>
+                    <button pButton icon="pi pi-trash" class="p-button-rounded p-button-danger"
+                            (click)="supprimerOnep(o.id, o.nom)"></button>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+
+    <!-- Tableau caché pour l'impression ONEP -->
+    <div id="table-onep" style="display: none;">
+        <table>
+            <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Numéro</th>
+                <th>Total</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let o of oneps">
+                <td>{{ o.nom }}</td>
+                <td>{{ o.numero }}</td>
+                <td>{{ getTotalPaiements(o.paiements) }}</td>
+            </tr>
+            </tbody>
+            <tfoot>
+            <tr>
+                <td colspan="2"><strong>Total général</strong></td>
+                <td><strong>{{ totalOnep }}</strong></td>
+            </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <!-- MODALE AJOUT ONE -->
+    <p-dialog header="Nouveau ONE" [(visible)]="showAddOneDialog" [modal]="true" [style]="{ width:'400px' }" [closable]="false">
+        <ng-template pTemplate="content">
+            <div class="p-fluid">
+                <div class="field mb-3">
+                    <label>Nom</label>
+                    <input pInputText [(ngModel)]="newOne.nom" required />
+                </div>
+
+                <div class="field mb-3">
+                    <label>Numéro</label>
+                    <input pInputText [(ngModel)]="newOne.numero" required />
+                </div>
+
+                <div class="field mb-3">
+                    <label>Paiements</label>
+                    <p-table [value]="newOne.paiements" responsiveLayout="scroll">
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th>Mois</th>
+                                <th>Date de paiement</th>
+                                <th>Montant</th>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-p>
+                            <tr>
+                                <td>{{ p.mois }}</td>
+                                <td><input type="date" pInputText [(ngModel)]="p.datePaiement" [ngModelOptions]="{standalone:true}" /></td>
+                                <td><input type="number" pInputText [(ngModel)]="p.montant" [ngModelOptions]="{standalone:true}" /></td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="footer">
+            <button pButton label="Annuler" icon="pi pi-times" class="p-button-text" (click)="showAddOneDialog=false"></button>
+            <button pButton label="Enregistrer" icon="pi pi-check" class="p-button-text" (click)="ajouterOne()"></button>
+        </ng-template>
+    </p-dialog>
+
+    <!-- MODALE MODIFICATION ONE -->
+    <p-dialog header="Modifier ONE" [(visible)]="showEditOneDialog" [modal]="true" [style]="{ width:'400px' }" [closable]="false">
+        <ng-template pTemplate="content">
+            <div class="p-fluid">
+                <div class="field mb-3">
+                    <label>Nom</label>
+                    <input pInputText [(ngModel)]="editOne.nom" required />
+                </div>
+
+                <div class="field mb-3">
+                    <label>Numéro</label>
+                    <input pInputText [(ngModel)]="editOne.numero" required />
+                </div>
+
+                <div class="field mb-3">
+                    <label>Paiements</label>
+                    <p-table [value]="editOne.paiements" responsiveLayout="scroll">
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th>Mois</th>
+                                <th>Date de paiement</th>
+                                <th>Montant</th>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-p>
+                            <tr>
+                                <td>{{ p.mois }}</td>
+                                <td><input type="date" pInputText [(ngModel)]="p.datePaiement" [ngModelOptions]="{standalone:true}" /></td>
+                                <td><input type="number" pInputText [(ngModel)]="p.montant" [ngModelOptions]="{standalone:true}" /></td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="footer">
+            <button pButton label="Annuler" icon="pi pi-times" class="p-button-text" (click)="showEditOneDialog=false"></button>
+            <button pButton label="Enregistrer" icon="pi pi-check" class="p-button-text" (click)="modifierOne()"></button>
+        </ng-template>
+    </p-dialog>
+
+    <!-- MODALE AJOUT ONEP -->
+    <p-dialog header="Nouveau ONEP" [(visible)]="showAddOnepDialog" [modal]="true" [style]="{ width:'400px' }" [closable]="false">
+        <ng-template pTemplate="content">
+            <div class="p-fluid">
+                <div class="field mb-3">
+                    <label>Nom</label>
+                    <input pInputText [(ngModel)]="newOnep.nom" required />
+                </div>
+
+                <div class="field mb-3">
+                    <label>Numéro</label>
+                    <input pInputText [(ngModel)]="newOnep.numero" required />
+                </div>
+
+                <div class="field mb-3">
+                    <label>Paiements</label>
+                    <p-table [value]="newOnep.paiements" responsiveLayout="scroll">
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th>Mois</th>
+                                <th>Date de paiement</th>
+                                <th>Montant</th>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-p>
+                            <tr>
+                                <td>{{ p.mois }}</td>
+                                <td><input type="date" pInputText [(ngModel)]="p.datePaiement" [ngModelOptions]="{standalone:true}" /></td>
+                                <td><input type="number" pInputText [(ngModel)]="p.montant" [ngModelOptions]="{standalone:true}" /></td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="footer">
+            <button pButton label="Annuler" icon="pi pi-times" class="p-button-text" (click)="showAddOnepDialog=false"></button>
+            <button pButton label="Enregistrer" icon="pi pi-check" class="p-button-text" (click)="ajouterOnep()"></button>
+        </ng-template>
+    </p-dialog>
+
+    <!-- MODALE MODIFICATION ONEP -->
+    <p-dialog header="Modifier ONEP" [(visible)]="showEditOnepDialog" [modal]="true" [style]="{ width:'400px' }" [closable]="false">
+        <ng-template pTemplate="content">
+            <div class="p-fluid">
+                <div class="field mb-3">
+                    <label>Nom</label>
+                    <input pInputText [(ngModel)]="editOnep.nom" required />
+                </div>
+
+                <div class="field mb-3">
+                    <label>Numéro</label>
+                    <input pInputText [(ngModel)]="editOnep.numero" required />
+                </div>
+
+                <div class="field mb-3">
+                    <label>Paiements</label>
+                    <p-table [value]="editOnep.paiements" responsiveLayout="scroll">
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th>Mois</th>
+                                <th>Date de paiement</th>
+                                <th>Montant</th>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-p>
+                            <tr>
+                                <td>{{ p.mois }}</td>
+                                <td><input type="date" pInputText [(ngModel)]="p.datePaiement" [ngModelOptions]="{standalone:true}" /></td>
+                                <td><input type="number" pInputText [(ngModel)]="p.montant" [ngModelOptions]="{standalone:true}" /></td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="footer">
+            <button pButton label="Annuler" icon="pi pi-times" class="p-button-text" (click)="showEditOnepDialog=false"></button>
+            <button pButton label="Enregistrer" icon="pi pi-check" class="p-button-text" (click)="modifierOnep()"></button>
+        </ng-template>
+    </p-dialog>
+
+    <p-toast></p-toast>
+    <p-confirmDialog></p-confirmDialog>
+</div>

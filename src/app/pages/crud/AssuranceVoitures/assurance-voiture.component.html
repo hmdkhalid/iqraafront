@@ -1,0 +1,325 @@
+<div class="card p-4 shadow-2 surface-card border-round-xl" id="print-section">
+    <h3 class="mb-3">Gestion des Assurances Voitures</h3>
+
+    <!-- Toolbar avec boutons -->
+    <p-toolbar class="mb-3">
+        <ng-template pTemplate="left">
+            <button
+                pButton
+                pRipple
+                icon="pi pi-plus"
+                class="p-button-success mr-2"
+                label="Ajouter"
+                (click)="openNew()">
+            </button>
+
+            <button
+                pButton
+                pRipple
+                icon="pi pi-trash"
+                class="p-button-danger"
+                label="Supprimer sélection"
+                [disabled]="!selectedAssurances || selectedAssurances.length === 0"
+                (click)="deleteSelectedAssurances()">
+            </button>
+        </ng-template>
+
+        <ng-template pTemplate="right">
+            <span class="p-input-icon-left mr-2">
+                <i class="pi pi-search"></i>
+                <input
+                    pInputText
+                    type="text"
+                    placeholder="Rechercher par matricule..."
+                    (input)="dt.filterGlobal($any($event).target.value, 'contains')"
+                    class="w-full sm:w-auto" />
+            </span>
+
+            <!-- Bouton Imprimer -->
+            <button
+                pButton
+                pRipple
+                icon="pi pi-print"
+                class="p-button-info"
+                label="Imprimer"
+                (click)="imprimer()">
+            </button>
+        </ng-template>
+    </p-toolbar>
+
+    <!-- Table principale -->
+    <p-table
+        #dt
+        [value]="assurances"
+        [(selection)]="selectedAssurances"
+        dataKey="id"
+        [paginator]="true"
+        [rows]="10"
+        [rowsPerPageOptions]="[5, 10, 20, 50]"
+        [responsiveLayout]="'scroll'"
+        selectionMode="multiple"
+        [globalFilterFields]="['matricule']"
+        styleClass="p-datatable-gridlines">
+
+        <ng-template pTemplate="header">
+            <tr>
+                <th style="width: 3rem">
+                    <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                </th>
+                <th pSortableColumn="matricule">
+                    Matricule
+                    <p-sortIcon field="matricule"></p-sortIcon>
+                </th>
+                <th pSortableColumn="prixAssurance">
+                    Prix Assurance
+                    <p-sortIcon field="prixAssurance"></p-sortIcon>
+                </th>
+                <th pSortableColumn="prixVisite">
+                    Prix Visite
+                    <p-sortIcon field="prixVisite"></p-sortIcon>
+                </th>
+                <th>Total</th>
+                <th style="width: 8rem">Actions</th>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-assurance let-rowIndex="rowIndex">
+            <tr>
+                <td>
+                    <p-tableCheckbox [value]="assurance"></p-tableCheckbox>
+                </td>
+                <td>
+                    <strong>{{ assurance.matricule || 'N/A' }}</strong>
+                </td>
+                <td>
+                    <span class="font-semibold" [class]="(assurance.prixAssurance || 0) > 0 ? '' : 'text-400'">
+                        {{ (assurance.prixAssurance || 0) | number:'1.2-2' }} MAD
+                    </span>
+                    <small *ngIf="(assurance.prixAssurance || 0) === 0" class="block text-400">Non payé</small>
+                </td>
+                <td>
+                    <span class="font-semibold" [class]="(assurance.prixVisite || 0) > 0 ? '' : 'text-400'">
+                        {{ (assurance.prixVisite || 0) | number:'1.2-2' }} MAD
+                    </span>
+                    <small *ngIf="(assurance.prixVisite || 0) === 0" class="block text-400">Non effectuée</small>
+                </td>
+                <td>
+                    <span class="font-bold text-primary">
+                        {{ ((assurance.prixAssurance || 0) + (assurance.prixVisite || 0)) | number:'1.2-2' }} MAD
+                    </span>
+                </td>
+                <td>
+                    <div class="flex gap-2">
+                        <button
+                            pButton
+                            pRipple
+                            icon="pi pi-pencil"
+                            class="p-button-rounded p-button-warning p-button-sm"
+                            (click)="editAssurance(assurance)"
+                            title="Modifier">
+                        </button>
+
+                        <button
+                            pButton
+                            pRipple
+                            icon="pi pi-trash"
+                            class="p-button-rounded p-button-danger p-button-sm"
+                            (click)="deleteAssurance(assurance.id!)"
+                            [disabled]="!assurance.id"
+                            title="Supprimer">
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+            <tr>
+                <td colspan="6" class="text-center p-4">
+                    <div>
+                        <i class="pi pi-info-circle text-4xl text-400 mb-3"></i>
+                        <p class="text-600 mb-3">Aucune assurance trouvée</p>
+                        <button
+                            pButton
+                            label="Ajouter la première assurance"
+                            class="p-button-sm"
+                            (click)="openNew()">
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+
+    <!-- Panneau des totaux -->
+    <div class="mt-4">
+        <div class="grid">
+            <div class="col-12 md:col-4">
+                <div class="card bg-blue-50 p-3">
+                    <div class="flex justify-content-between align-items-center">
+                        <div>
+                            <span class="text-blue-600 font-semibold">Total Assurance</span>
+                            <div class="text-blue-800 font-bold text-xl">
+                                {{ totalAssurance | number:'1.2-2' }} MAD
+                            </div>
+                        </div>
+                        <i class="pi pi-shield text-blue-600 text-3xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 md:col-4">
+                <div class="card bg-green-50 p-3">
+                    <div class="flex justify-content-between align-items-center">
+                        <div>
+                            <span class="text-green-600 font-semibold">Total Visite</span>
+                            <div class="text-green-800 font-bold text-xl">
+                                {{ totalVisite | number:'1.2-2' }} MAD
+                            </div>
+                        </div>
+                        <i class="pi pi-check-circle text-green-600 text-3xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 md:col-4">
+                <div class="card bg-purple-50 p-3">
+                    <div class="flex justify-content-between align-items-center">
+                        <div>
+                            <span class="text-purple-600 font-semibold">Total Général</span>
+                            <div class="text-purple-800 font-bold text-xl">
+                                {{ getTotalGeneral() | number:'1.2-2' }} MAD
+                            </div>
+                        </div>
+                        <i class="pi pi-calculator text-purple-600 text-3xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dialog pour ajouter/modifier -->
+    <p-dialog
+        [header]="isEditMode ? 'Modifier Assurance' : 'Ajouter Assurance'"
+        [(visible)]="showDialog"
+        [modal]="true"
+        [style]="{width: '500px'}"
+        [closable]="true">
+
+        <div class="p-fluid">
+            <!-- Dropdown pour sélectionner la voiture -->
+            <div class="field">
+                <label for="voitureSelect" class="font-semibold">Voiture *</label>
+                <p-dropdown
+                    id="voitureSelect"
+                    [options]="voitures"
+                    [(ngModel)]="selectedVoiture"
+                    optionLabel="matricule"
+                    placeholder="Sélectionnez une voiture"
+                    [filter]="true"
+                    filterBy="matricule"
+                    [showClear]="true"
+                    (onChange)="onVoitureSelected($event)"
+                    [disabled]="isEditMode">
+                    <ng-template pTemplate="selectedItem">
+                        <div *ngIf="selectedVoiture">
+                            <i class="pi pi-car mr-2"></i>
+                            {{ selectedVoiture.matricule }}
+                        </div>
+                    </ng-template>
+                    <ng-template let-voiture pTemplate="item">
+                        <div class="flex align-items-center">
+                            <i class="pi pi-car mr-2"></i>
+                            {{ voiture.matricule }}
+                        </div>
+                    </ng-template>
+                </p-dropdown>
+                <small *ngIf="isEditMode" class="text-500">
+                    Le matricule ne peut pas être modifié
+                </small>
+            </div>
+
+            <!-- Affichage du matricule sélectionné -->
+            <div class="field" *ngIf="newAssurance.matricule">
+                <label class="font-semibold">Matricule sélectionné</label>
+                <div class="p-3 bg-gray-100 border-round">
+                    <i class="pi pi-car mr-2"></i>
+                    {{ newAssurance.matricule }}
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="prixAssurance" class="font-semibold">Prix Assurance (MAD)</label>
+                <input
+                    id="prixAssurance"
+                    type="number"
+                    pInputText
+                    [(ngModel)]="newAssurance.prixAssurance"
+                    min="0"
+                    step="0.01"
+                    placeholder="0.00 (optionnel)" />
+                <small class="text-500">Laissez vide ou 0 si pas d'assurance</small>
+            </div>
+
+            <div class="field">
+                <label for="prixVisite" class="font-semibold">Prix Visite (MAD)</label>
+                <input
+                    id="prixVisite"
+                    type="number"
+                    pInputText
+                    [(ngModel)]="newAssurance.prixVisite"
+                    min="0"
+                    step="0.01"
+                    placeholder="0.00 (optionnel)" />
+                <small class="text-500">Laissez vide ou 0 si pas de visite technique</small>
+            </div>
+
+            <!-- Aperçu du total -->
+            <div class="field" *ngIf="(newAssurance.prixAssurance || 0) > 0 || (newAssurance.prixVisite || 0) > 0">
+                <label class="font-semibold">Aperçu du total</label>
+                <div class="p-3 bg-primary-50 border-round">
+                    <div class="flex justify-content-between mb-2" *ngIf="(newAssurance.prixAssurance || 0) > 0">
+                        <span>Assurance:</span>
+                        <span class="font-semibold">{{ (newAssurance.prixAssurance || 0) | number:'1.2-2' }} MAD</span>
+                    </div>
+                    <div class="flex justify-content-between mb-2" *ngIf="(newAssurance.prixVisite || 0) > 0">
+                        <span>Visite:</span>
+                        <span class="font-semibold">{{ (newAssurance.prixVisite || 0) | number:'1.2-2' }} MAD</span>
+                    </div>
+                    <hr *ngIf="(newAssurance.prixAssurance || 0) > 0 && (newAssurance.prixVisite || 0) > 0">
+                    <div class="flex justify-content-between">
+                        <span class="font-bold">Total:</span>
+                        <span class="text-primary font-bold text-xl">
+                            {{ ((newAssurance.prixAssurance || 0) + (newAssurance.prixVisite || 0)) | number:'1.2-2' }} MAD
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <ng-template pTemplate="footer">
+            <div class="flex justify-content-end gap-2">
+                <button
+                    pButton
+                    label="Annuler"
+                    class="p-button-text p-button-secondary"
+                    (click)="hideDialog()">
+                </button>
+                <button
+                    pButton
+                    label="Enregistrer"
+                    icon="pi pi-check"
+                    class="p-button-primary"
+                    (click)="saveAssurance()"
+                    [disabled]="!newAssurance.matricule || ((newAssurance.prixAssurance || 0) <= 0 && (newAssurance.prixVisite || 0) <= 0)">
+                </button>
+            </div>
+        </ng-template>
+    </p-dialog>
+
+    <!-- Messages toast -->
+    <p-toast position="top-right"></p-toast>
+
+    <!-- Dialog de confirmation -->
+    <p-confirmDialog></p-confirmDialog>
+</div>

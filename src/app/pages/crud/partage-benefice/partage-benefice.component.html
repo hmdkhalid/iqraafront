@@ -1,0 +1,92 @@
+<div class="card p-4 shadow-2 surface-card border-round-xl">
+
+    <p-toolbar class="mb-4">
+        <ng-template pTemplate="left">
+            <h4 class="m-0">Gestion des Partages de Bénéfices</h4>
+        </ng-template>
+        <ng-template pTemplate="right">
+            <div class="flex gap-2">
+                <button pButton icon="pi pi-print" class="p-button-info" label="Imprimer"
+                        (click)="imprimer()"></button>
+                <button pButton icon="pi pi-plus" class="p-button-success" label="Ajouter"
+                        (click)="showAddDialog = true"></button>
+            </div>
+        </ng-template>
+    </p-toolbar>
+
+    <div class="mb-3">
+        <label><strong>Total général :</strong></label>
+        <input type="number" pInputText [value]="totalGeneral" disabled />
+    </div>
+
+    <p-table [value]="partages" [paginator]="true" [rows]="5" [rowsPerPageOptions]="[5,10,20]" #dt>
+        <ng-template pTemplate="header">
+            <tr>
+                <th>Montant (DH)</th>
+                <th>Date de partage</th>
+                <th>Actions</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-partage>
+            <tr>
+                <td>{{ partage.montant }}</td>
+                <td>{{ partage.datePartage | date: 'dd/MM/yyyy' }}</td>
+                <td>
+                    <button pButton icon="pi pi-pencil" class="p-button-rounded p-button-warning me-2"
+                            (click)="ouvrirModifier(partage)"></button>
+                    <button pButton icon="pi pi-trash" class="p-button-rounded p-button-danger"
+                            (click)="supprimer(partage.id)"></button>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+
+    <!-- MODALE AJOUT -->
+    <p-dialog header="Nouveau Partage" [(visible)]="showAddDialog" [modal]="true" [style]="{ width:'400px' }" [closable]="false">
+        <ng-template pTemplate="content">
+            <div class="p-fluid">
+                <div class="field mb-3">
+                    <label>Montant</label>
+                    <input type="text" pInputText [(ngModel)]="newPartage.montant" />
+                </div>
+                <div class="field mb-3">
+                    <label>Date de partage</label>
+                    <p-calendar [(ngModel)]="newPartage.datePartage" dateFormat="dd/mm/yy" showIcon="true"></p-calendar>
+                </div>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="footer">
+            <button pButton label="Annuler" icon="pi pi-times" class="p-button-text"
+                    (click)="showAddDialog = false"></button>
+            <button pButton label="Enregistrer" icon="pi pi-check" class="p-button-text"
+                    (click)="ajouter()"></button>
+        </ng-template>
+    </p-dialog>
+
+    <!-- MODALE MODIFICATION -->
+    <p-dialog header="Modifier Partage" [(visible)]="showEditDialog" [modal]="true" [style]="{ width:'400px' }" [closable]="false">
+        <ng-template pTemplate="content">
+            <div class="p-fluid">
+                <div class="field mb-3">
+                    <label>Montant</label>
+                    <input type="number" pInputText [(ngModel)]="editPartage.montant" />
+                </div>
+                <div class="field mb-3">
+                    <label>Date de partage</label>
+                    <p-calendar [(ngModel)]="editPartage.datePartage" dateFormat="dd/mm/yy" showIcon="true"></p-calendar>
+                </div>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="footer">
+            <button pButton label="Annuler" icon="pi pi-times" class="p-button-text"
+                    (click)="showEditDialog = false"></button>
+            <button pButton label="Enregistrer" icon="pi pi-check" class="p-button-text"
+                    (click)="modifier()"></button>
+        </ng-template>
+    </p-dialog>
+
+    <!-- ✅ Ajoute ces deux lignes -->
+    <p-toast></p-toast>
+    <p-confirmDialog></p-confirmDialog>
+
+</div>

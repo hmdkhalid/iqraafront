@@ -1,0 +1,77 @@
+.badge-qualified {
+    background-color: #28a745;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 4px;
+}
+
+.badge-unqualified {
+    background-color: #dc3545;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 4px;
+}
+
+.badge-negotiation {
+    background-color: #ffc107;
+    color: black;
+    padding: 3px 8px;
+    border-radius: 4px;
+}
+
+.badge-default {
+    background-color: #6c757d;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 4px;
+}
+.caption-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.caption-container .search-wrapper {
+    margin-left: auto;
+}
+.search-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-wrapper i.pi-search {
+    position: absolute;
+    left: 0.75rem;
+    color: #6c757d;
+}
+
+.search-wrapper input {
+    padding-left: 2.25rem !important;
+    height: 2.5rem;
+    border-radius: 0.5rem;
+    border: 1px solid #ced4da;
+}
+
+.search-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-wrapper i.pi-search {
+    position: absolute;
+    left: 0.75rem;
+    color: #6c757d;
+}
+
+.search-wrapper input {
+    padding-left: 2.25rem !important;
+    height: 2.5rem;
+    border-radius: 0.5rem;
+    border: 1px solid #ced4da;
+}
+
+
+

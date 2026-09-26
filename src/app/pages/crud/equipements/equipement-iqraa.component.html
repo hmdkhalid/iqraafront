@@ -1,0 +1,230 @@
+<div class="card p-4 shadow-2 surface-card border-round-xl">
+    <style>
+        .badge-qualified {
+            background-color: #28a745;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+        }
+
+        .badge-unqualified {
+            background-color: #dc3545;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+        }
+
+        .badge-negotiation {
+            background-color: #ffc107;
+            color: black;
+            padding: 3px 8px;
+            border-radius: 4px;
+        }
+
+        .badge-default {
+            background-color: #6c757d;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+        }
+
+        .caption-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .caption-container .search-wrapper {
+            margin-left: auto;
+        }
+
+        .search-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-wrapper i.pi-search {
+            position: absolute;
+            left: 0.75rem;
+            color: #6c757d;
+            z-index: 1;
+        }
+
+        .search-wrapper input {
+            padding-left: 2.25rem !important;
+            height: 2.5rem;
+            border-radius: 0.5rem;
+            border: 1px solid #ced4da;
+        }
+    </style>
+
+    <h3 class="mb-3">Gestion des équipements Iqraa</h3>
+
+    <!-- ================= SECTION IQRAA 1 ================= -->
+    <p-toolbar class="mb-3">
+        <ng-template pTemplate="left">
+            <h4 class="m-0">Équipements Iqraa 1</h4>
+        </ng-template>
+        <ng-template pTemplate="right">
+            <button pButton icon="pi pi-plus" class="p-button-success" label="Ajouter" (click)="ouvrirAjouterIqraa1()"></button>
+            <button pButton icon="pi pi-trash" class="p-button-danger ms-2" label="Supprimer"
+                    [disabled]="!selectedIqraa1.length"
+                    (click)="supprimerIqraa1Selectionnes()"></button>
+            <button pButton icon="pi pi-print" class="p-button-secondary ms-2" label="Imprimer"
+                    (click)="imprimerIqraa1()"></button>
+        </ng-template>
+    </p-toolbar>
+
+    <p-table #dtIqraa1 [value]="equipementsIqraa1" [(selection)]="selectedIqraa1" dataKey="id"
+             [paginator]="true" [rows]="5" [rowsPerPageOptions]="[5,10,20]"
+             [responsiveLayout]="'scroll'" selectionMode="multiple"
+             [globalFilterFields]="['nom','date']">
+
+        <ng-template pTemplate="caption">
+            <div class="caption-container">
+                <span class="text-lg font-semibold">Liste des équipements Iqraa 1</span>
+                <span class="p-input-icon-left search-wrapper">
+                    <i class="pi pi-search"></i>
+                    <input pInputText type="text" placeholder="Rechercher..."
+                           (input)="onSearchIqraa1($event)" style="width:200px" />
+                </span>
+            </div>
+        </ng-template>
+
+        <ng-template pTemplate="header">
+            <tr>
+                <th style="width: 3rem"><p-tableHeaderCheckbox></p-tableHeaderCheckbox></th>
+                <th>Date</th>
+                <th>Nom</th>
+                <th>Prix</th>
+                <th>Actions</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-e>
+            <tr>
+                <td><p-tableCheckbox [value]="e"></p-tableCheckbox></td>
+                <td>{{ e.date }}</td>
+                <td>{{ e.nom }}</td>
+                <td>{{ e.prix | currency:'MAD' }}</td>
+                <td>
+                    <button pButton icon="pi pi-pencil" class="p-button-rounded p-button-warning me-2"
+                            (click)="ouvrirModifierIqraa1(e)"></button>
+                    <button pButton icon="pi pi-trash" class="p-button-rounded p-button-danger"
+                            (click)="supprimerIqraa1(e.id!)"></button>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+
+    <!-- ================= SECTION IQRAA 2 ================= -->
+    <p-toolbar class="mt-5 mb-3">
+        <ng-template pTemplate="left">
+            <h4 class="m-0">Équipements Iqraa 2</h4>
+        </ng-template>
+        <ng-template pTemplate="right">
+            <button pButton icon="pi pi-plus" class="p-button-success" label="Ajouter" (click)="ouvrirAjouterIqraa2()"></button>
+            <button pButton icon="pi pi-trash" class="p-button-danger ms-2" label="Supprimer"
+                    [disabled]="!selectedIqraa2.length"
+                    (click)="supprimerIqraa2Selectionnes()"></button>
+            <button pButton icon="pi pi-print" class="p-button-secondary ms-2" label="Imprimer"
+                    (click)="imprimerIqraa2()"></button>
+        </ng-template>
+    </p-toolbar>
+
+    <p-table #dtIqraa2 [value]="equipementsIqraa2" [(selection)]="selectedIqraa2" dataKey="id"
+             [paginator]="true" [rows]="5" [rowsPerPageOptions]="[5,10,20]"
+             [responsiveLayout]="'scroll'" selectionMode="multiple"
+             [globalFilterFields]="['nom','date']">
+
+        <ng-template pTemplate="caption">
+            <div class="caption-container">
+                <span class="text-lg font-semibold">Liste des équipements Iqraa 2</span>
+                <span class="p-input-icon-left search-wrapper">
+                    <i class="pi pi-search"></i>
+                    <input pInputText type="text" placeholder="Rechercher..."
+                           (input)="onSearchIqraa2($event)" style="width:200px" />
+                </span>
+            </div>
+        </ng-template>
+
+        <ng-template pTemplate="header">
+            <tr>
+                <th style="width: 3rem"><p-tableHeaderCheckbox></p-tableHeaderCheckbox></th>
+                <th>Date</th>
+                <th>Nom</th>
+                <th>Prix</th>
+                <th>Actions</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-e>
+            <tr>
+                <td><p-tableCheckbox [value]="e"></p-tableCheckbox></td>
+                <td>{{ e.date }}</td>
+                <td>{{ e.nom }}</td>
+                <td>{{ e.prix | currency:'MAD' }}</td>
+                <td>
+                    <button pButton icon="pi pi-pencil" class="p-button-rounded p-button-warning me-2"
+                            (click)="ouvrirModifierIqraa2(e)"></button>
+                    <button pButton icon="pi pi-trash" class="p-button-rounded p-button-danger"
+                            (click)="supprimerIqraa2(e.id!)"></button>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+
+    <!-- ================= TOTAL GENERAL ================= -->
+    <div class="mt-4 text-end">
+        <label class="fw-bold me-2">Total général:</label>
+        <input type="text" pInputText [value]="getTotalGeneral() | currency : 'MAD'" readonly />
+    </div>
+
+    <!-- ================= DIALOG AJOUT / MODIF IQRAA1 ================= -->
+    <p-dialog header="Équipement Iqraa 1" [(visible)]="showAddIqraa1" [modal]="true" [closable]="false" [style]="{width: '400px'}">
+        <div class="p-fluid">
+            <div class="field">
+                <label for="nomIqraa1">Nom</label>
+                <input id="nomIqraa1" type="text" pInputText [(ngModel)]="newIqraa1.nom" />
+            </div>
+            <div class="field">
+                <label for="dateIqraa1">Date</label>
+                <p-calendar id="dateIqraa1" [(ngModel)]="newIqraa1.date" dateFormat="yy-mm-dd"></p-calendar>
+            </div>
+            <div class="field">
+                <label for="prixIqraa1">Prix</label>
+                <input id="prixIqraa1" type="number" pInputText [(ngModel)]="newIqraa1.prix" />
+            </div>
+        </div>
+        <ng-template pTemplate="footer">
+            <button pButton label="Annuler" class="p-button-text" (click)="annulerIqraa1()"></button>
+            <button pButton label="Enregistrer" class="p-button-success" (click)="ajouterIqraa1()"></button>
+        </ng-template>
+    </p-dialog>
+
+    <!-- ================= DIALOG AJOUT / MODIF IQRAA2 ================= -->
+    <p-dialog header="Équipement Iqraa 2" [(visible)]="showAddIqraa2" [modal]="true" [closable]="false" [style]="{width: '400px'}">
+        <div class="p-fluid">
+            <div class="field">
+                <label for="nomIqraa2">Nom</label>
+                <input id="nomIqraa2" type="text" pInputText [(ngModel)]="newIqraa2.nom" />
+            </div>
+            <div class="field">
+                <label for="dateIqraa2">Date</label>
+                <p-calendar id="dateIqraa2" [(ngModel)]="newIqraa2.date" dateFormat="yy-mm-dd"></p-calendar>
+            </div>
+            <div class="field">
+                <label for="prixIqraa2">Prix</label>
+                <input id="prixIqraa2" type="number" pInputText [(ngModel)]="newIqraa2.prix" />
+            </div>
+        </div>
+        <ng-template pTemplate="footer">
+            <button pButton label="Annuler" class="p-button-text" (click)="annulerIqraa2()"></button>
+            <button pButton label="Enregistrer" class="p-button-success" (click)="ajouterIqraa2()"></button>
+        </ng-template>
+    </p-dialog>
+
+    <!-- Toast & Confirm Dialog -->
+    <p-toast></p-toast>
+    <p-confirmDialog></p-confirmDialog>
+</div>

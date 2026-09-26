@@ -1,0 +1,125 @@
+<div class="card p-4 shadow-2 surface-card border-round-xl">
+    <p-toolbar class="mb-4">
+        <ng-template pTemplate="left">
+            <h4 class="m-0">Gestion des Assurances</h4>
+        </ng-template>
+        <ng-template pTemplate="right">
+            <button pButton icon="pi pi-plus" class="p-button-success" label="Ajouter" (click)="showAddDialog = true"></button>
+            <button pButton icon="pi pi-trash" class="p-button-danger ms-2" label="Supprimer"
+                    [disabled]="!selectedAssurances.length"
+                    (click)="supprimerAssurancesSelectionnees()"></button>
+            <!-- 🔹 Bouton Imprimer -->
+            <button pButton icon="pi pi-print" class="p-button-secondary ms-2" label="Imprimer"
+                    (click)="imprimer()"></button>
+        </ng-template>
+    </p-toolbar>
+
+    <div class="mb-3">
+        <label>Total général :</label>
+        <input type="number" pInputText [value]="totalGeneral" disabled />
+    </div>
+
+    <p-table #dt [value]="assurances" [(selection)]="selectedAssurances"
+             dataKey="id" [paginator]="true" [rows]="5" [rowsPerPageOptions]="[5,10,20]"
+             [responsiveLayout]="'scroll'" [globalFilterFields]="['type']" selectionMode="multiple">
+
+        <ng-template pTemplate="caption">
+            <div class="caption-container">
+                <span class="text-lg font-semibold">Liste des Assurances</span>
+                <span class="p-input-icon-left search-wrapper">
+                    <i class="pi pi-search"></i>
+                    <input pInputText type="text" placeholder="Rechercher..." (input)="onGlobalFilter($event)" style="width:200px" />
+                </span>
+            </div>
+        </ng-template>
+
+        <ng-template pTemplate="header">
+            <tr>
+                <th style="width:3rem"><p-tableHeaderCheckbox></p-tableHeaderCheckbox></th>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Prix</th>
+                <th>Actions</th>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-assurance>
+            <tr>
+                <td><p-tableCheckbox [value]="assurance"></p-tableCheckbox></td>
+                <td>{{ assurance.date | date:'dd/MM/yyyy' }}</td>
+                <td>{{ assurance.type }}</td>
+                <td>{{ assurance.prix }}</td>
+                <td>
+                    <button pButton icon="pi pi-pencil" class="p-button-rounded p-button-warning me-2"
+                            (click)="ouvrirModifierAssurance(assurance)"></button>
+                    <button pButton icon="pi pi-trash" class="p-button-rounded p-button-danger"
+                            (click)="supprimerAssurance(assurance.id, assurance.type)"></button>
+                </td>
+            </tr>
+        </ng-template>
+
+    </p-table>
+
+    <!-- MODALE AJOUT -->
+    <p-dialog header="Nouvelle Assurance" [(visible)]="showAddDialog" [modal]="true" [style]="{ width:'400px' }" [closable]="false">
+        <ng-template pTemplate="content">
+            <div class="p-fluid">
+                <div class="field mb-3">
+                    <label>Date</label>
+                    <input type="date" pInputText [(ngModel)]="newAssurance.date" required />
+                </div>
+                <div class="field mb-3">
+                    <label>Type</label>
+                    <p-dropdown
+                        [options]="typeOptions"
+                        [(ngModel)]="newAssurance.type"
+                        placeholder="Sélectionnez un type"
+                        optionLabel="label"
+                        optionValue="value">
+                    </p-dropdown>
+                </div>
+                <div class="field mb-3">
+                    <label>Prix</label>
+                    <input type="number" pInputText [(ngModel)]="newAssurance.prix" />
+                </div>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="footer">
+            <button pButton label="Annuler" icon="pi pi-times" class="p-button-text" (click)="showAddDialog = false"></button>
+            <button pButton label="Enregistrer" icon="pi pi-check" class="p-button-text" (click)="ajouterAssurance()"></button>
+        </ng-template>
+    </p-dialog>
+
+    <!-- MODALE MODIFICATION -->
+    <p-dialog header="Modifier Assurance" [(visible)]="showEditDialog" [modal]="true" [style]="{ width:'400px' }" [closable]="false">
+        <ng-template pTemplate="content">
+            <div class="p-fluid">
+                <div class="field mb-3">
+                    <label>Date</label>
+                    <input type="date" pInputText [(ngModel)]="editAssurance.date" required />
+                </div>
+                <div class="field mb-3">
+                    <label>Type</label>
+                    <p-dropdown
+                        [options]="typeOptions"
+                        [(ngModel)]="editAssurance.type"
+                        placeholder="Sélectionnez un type"
+                        optionLabel="label"
+                        optionValue="value">
+                    </p-dropdown>
+                </div>
+                <div class="field mb-3">
+                    <label>Prix</label>
+                    <input type="number" pInputText [(ngModel)]="editAssurance.prix" />
+                </div>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="footer">
+            <button pButton label="Annuler" icon="pi pi-times" class="p-button-text" (click)="showEditDialog = false"></button>
+            <button pButton label="Enregistrer" icon="pi pi-check" class="p-button-text" (click)="modifierAssurance()"></button>
+        </ng-template>
+    </p-dialog>
+
+    <p-toast></p-toast>
+    <p-confirmDialog></p-confirmDialog>
+</div>

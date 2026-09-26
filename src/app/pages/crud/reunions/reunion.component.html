@@ -1,0 +1,251 @@
+<div class="card p-4 shadow-2 surface-card border-round-xl" id="print-section">
+    <h3 class="mb-3">Gestion des Réunions</h3>
+
+    <!-- Toolbar avec boutons -->
+    <p-toolbar class="mb-3">
+        <ng-template pTemplate="left">
+            <button
+                pButton
+                pRipple
+                icon="pi pi-plus"
+                class="p-button-success mr-2"
+                label="Ajouter"
+                (click)="openNew()">
+            </button>
+
+            <button
+                pButton
+                pRipple
+                icon="pi pi-trash"
+                class="p-button-danger"
+                label="Supprimer sélection"
+                [disabled]="!selectedReunions || selectedReunions.length === 0"
+                (click)="deleteSelectedReunions()">
+            </button>
+        </ng-template>
+
+        <ng-template pTemplate="right">
+            <span class="p-input-icon-left mr-2">
+                <i class="pi pi-search"></i>
+                <input
+                    pInputText
+                    type="text"
+                    placeholder="Rechercher par type..."
+                    (input)="dt.filterGlobal($any($event).target.value, 'contains')"
+                    class="w-full sm:w-auto" />
+            </span>
+
+            <!-- Bouton Imprimer -->
+            <button
+                pButton
+                pRipple
+                icon="pi pi-print"
+                class="p-button-info"
+                label="Imprimer"
+                (click)="imprimer()">
+            </button>
+        </ng-template>
+    </p-toolbar>
+
+    <!-- Table principale -->
+    <p-table
+        #dt
+        [value]="reunions"
+        [(selection)]="selectedReunions"
+        dataKey="id"
+        [paginator]="true"
+        [rows]="10"
+        [rowsPerPageOptions]="[5, 10, 20, 50]"
+        [responsiveLayout]="'scroll'"
+        selectionMode="multiple"
+        [globalFilterFields]="['type']"
+        styleClass="p-datatable-gridlines">
+
+        <ng-template pTemplate="header">
+            <tr>
+                <th style="width: 3rem">
+                    <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                </th>
+                <th pSortableColumn="type">
+                    Type
+                    <p-sortIcon field="type"></p-sortIcon>
+                </th>
+                <th pSortableColumn="date">
+                    Date
+                    <p-sortIcon field="date"></p-sortIcon>
+                </th>
+                <th pSortableColumn="montant">
+                    Montant
+                    <p-sortIcon field="montant"></p-sortIcon>
+                </th>
+
+                <th style="width: 8rem">Actions</th>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-reunion>
+            <tr>
+                <td>
+                    <p-tableCheckbox [value]="reunion"></p-tableCheckbox>
+                </td>
+                <td>
+                    <strong>{{ reunion.type || 'N/A' }}</strong>
+                </td>
+                <td>
+                    {{ reunion.date | date:'dd/MM/yyyy' }}
+                </td>
+                <td>
+                    <span class="font-semibold" [class]="reunion.montant ? '' : 'text-400'">
+                        {{ reunion.montant ? (reunion.montant | number:'1.2-2') + ' MAD' : 'N/A' }}
+                    </span>
+                </td>
+
+                <td>
+                    <div class="flex gap-2">
+                        <button
+                            pButton
+                            pRipple
+                            icon="pi pi-pencil"
+                            class="p-button-rounded p-button-warning p-button-sm"
+                            (click)="editReunion(reunion)"
+                            title="Modifier">
+                        </button>
+
+                        <button
+                            pButton
+                            pRipple
+                            icon="pi pi-trash"
+                            class="p-button-rounded p-button-danger p-button-sm"
+                            (click)="deleteReunion(reunion.id!)"
+                            [disabled]="!reunion.id"
+                            title="Supprimer">
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+            <tr>
+                <td colspan="6" class="text-center p-4">
+                    <div>
+                        <i class="pi pi-info-circle text-4xl text-400 mb-3"></i>
+                        <p class="text-600 mb-3">Aucune réunion trouvée</p>
+                        <button
+                            pButton
+                            label="Ajouter la première réunion"
+                            class="p-button-sm"
+                            (click)="openNew()">
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+
+    <!-- Panneau des totaux -->
+    <div class="mt-4">
+        <div class="grid">
+            <div class="col-12 md:col-6">
+                <div class="card bg-blue-50 p-3">
+                    <div class="flex justify-content-between align-items-center">
+                        <div>
+                            <span class="text-blue-600 font-semibold">Total Montant Réunions</span>
+                            <div class="text-blue-800 font-bold text-xl">
+                                {{ totalGeneral | number:'1.2-2' }} MAD
+                            </div>
+                        </div>
+                        <i class="pi pi-wallet text-blue-600 text-3xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 md:col-6">
+                <div class="card bg-purple-50 p-3">
+                    <div class="flex justify-content-between align-items-center">
+                        <div>
+                            <span class="text-purple-600 font-semibold">Nombre total de Réunions</span>
+                            <div class="text-purple-800 font-bold text-xl">
+                                {{ reunions.length || 0 }}
+                            </div>
+                        </div>
+                        <i class="pi pi-calendar text-purple-600 text-3xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dialog pour ajouter/modifier -->
+    <p-dialog
+        [header]="isEditMode ? 'Modifier Réunion' : 'Ajouter Réunion'"
+        [(visible)]="showDialog"
+        [modal]="true"
+        [style]="{width: '500px'}"
+        [closable]="true">
+
+        <div class="p-fluid">
+            <div class="field">
+                <label for="type" class="font-semibold">Type *</label>
+                <input
+                    id="type"
+                    type="text"
+                    pInputText
+                    [(ngModel)]="newReunion.type"
+                    placeholder="Ex: Comité, AG..."
+                    required />
+            </div>
+
+            <div class="field">
+                <label for="date" class="font-semibold">Date *</label>
+                <p-calendar
+                    id="date"
+                    [(ngModel)]="newReunion.date"
+                    dateFormat="dd/mm/yy"
+                    [showIcon]="true"
+                    [monthNavigator]="true"
+                    [yearNavigator]="true"
+                    yearRange="2000:2100"
+                    required>
+                </p-calendar>
+            </div>
+
+            <div class="field">
+                <label for="montant" class="font-semibold">Montant (MAD)</label>
+                <input
+                    id="montant"
+                    type="number"
+                    pInputText
+                    [(ngModel)]="newReunion.montant"
+                    min="0"
+                    step="0.01"
+                    placeholder="0.00" />
+            </div>
+        </div>
+
+        <ng-template pTemplate="footer">
+            <div class="flex justify-content-end gap-2">
+                <button
+                    pButton
+                    label="Annuler"
+                    class="p-button-text p-button-secondary"
+                    (click)="hideDialog()">
+                </button>
+                <button
+                    pButton
+                    label="Enregistrer"
+                    icon="pi pi-check"
+                    class="p-button-primary"
+                    (click)="saveReunion()"
+                    [disabled]="!newReunion.type || !newReunion.date">
+                </button>
+            </div>
+        </ng-template>
+    </p-dialog>
+
+    <!-- Messages toast -->
+    <p-toast position="top-right"></p-toast>
+
+    <!-- Dialog de confirmation -->
+    <p-confirmDialog></p-confirmDialog>
+</div>

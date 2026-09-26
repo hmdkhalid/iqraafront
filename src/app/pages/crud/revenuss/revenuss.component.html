@@ -1,0 +1,106 @@
+<div class="card p-4 shadow-2 surface-card border-round-xl">
+
+    <p-toolbar class="mb-4">
+        <ng-template pTemplate="left">
+            <h4 class="m-0">Gestion des Revenus</h4>
+        </ng-template>
+        <ng-template pTemplate="right">
+            <button pButton icon="pi pi-plus" class="p-button-success" label="Ajouter"
+                    (click)="showAddDialog = true"></button>
+            <button pButton icon="pi pi-trash" class="p-button-danger ms-2" label="Supprimer"
+                    [disabled]="!selectedRevenus.length"
+                    (click)="supprimerRevenusSelectionnes()"></button>
+            <button pButton icon="pi pi-print" class="p-button-secondary ms-2" label="Imprimer"
+                    (click)="imprimer()"></button>
+        </ng-template>
+    </p-toolbar>
+
+    <!-- 🔹 Total général -->
+    <div class="mb-3">
+        <label>Total général :</label>
+        <input type="number" pInputText [value]="totalGeneral" disabled />
+    </div>
+
+    <p-table #dt [value]="revenus" [(selection)]="selectedRevenus"
+             dataKey="id" [paginator]="true" [rows]="5" [rowsPerPageOptions]="[5,10,20]"
+             [responsiveLayout]="'scroll'" selectionMode="multiple">
+
+        <ng-template pTemplate="header">
+            <tr>
+                <th style="width:3rem"><p-tableHeaderCheckbox></p-tableHeaderCheckbox></th>
+                <th>Revenus Bureau</th>
+                <th>Revenus Activités Parallèles</th>
+                <th>Reste Année Dernière</th> <!-- 🆕 -->
+                <th>Total</th>
+                <th>Actions</th>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-r>
+            <tr>
+                <td><p-tableCheckbox [value]="r"></p-tableCheckbox></td>
+                <td>{{ r.montantRevenusBureau }}</td>
+                <td>{{ r.montantRevenusActivitesParalleles }}</td>
+                <td>{{ r.resteAnneeDerniere }}</td> <!-- 🆕 -->
+                <td><strong>{{ r.totalGeneral }}</strong></td>
+                <td>
+                    <button pButton icon="pi pi-pencil" class="p-button-rounded p-button-warning me-2"
+                            (click)="ouvrirModifierRevenu(r)"></button>
+                    <button pButton icon="pi pi-trash" class="p-button-rounded p-button-danger"
+                            (click)="supprimerRevenu(r.id)"></button>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+
+    <!-- 🔹 MODALE AJOUT -->
+    <p-dialog header="Nouveau Revenu" [(visible)]="showAddDialog" [modal]="true" [style]="{ width:'400px' }" [closable]="false">
+        <ng-template pTemplate="content">
+            <div class="p-fluid">
+                <div class="field mb-3">
+                    <label>Revenus Bureau</label>
+                    <input type="number" pInputText [(ngModel)]="newRevenu.montantRevenusBureau" />
+                </div>
+                <div class="field mb-3">
+                    <label>Revenus Activités Parallèles</label>
+                    <input type="number" pInputText [(ngModel)]="newRevenu.montantRevenusActivitesParalleles" />
+                </div>
+                <div class="field mb-3">
+                    <label>Reste Année Dernière</label>
+                    <input type="number" pInputText [(ngModel)]="newRevenu.resteAnneeDerniere" /> <!-- 🆕 -->
+                </div>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="footer">
+            <button pButton label="Annuler" icon="pi pi-times" class="p-button-text" (click)="showAddDialog = false"></button>
+            <button pButton label="Enregistrer" icon="pi pi-check" class="p-button-text" (click)="ajouterRevenu()"></button>
+        </ng-template>
+    </p-dialog>
+
+    <!-- 🔹 MODALE MODIFICATION -->
+    <p-dialog header="Modifier Revenu" [(visible)]="showEditDialog" [modal]="true" [style]="{ width:'400px' }" [closable]="false">
+        <ng-template pTemplate="content">
+            <div class="p-fluid">
+                <div class="field mb-3">
+                    <label>Revenus Bureau</label>
+                    <input type="number" pInputText [(ngModel)]="editRevenu.montantRevenusBureau" />
+                </div>
+                <div class="field mb-3">
+                    <label>Revenus Activités Parallèles</label>
+                    <input type="number" pInputText [(ngModel)]="editRevenu.montantRevenusActivitesParalleles" />
+                </div>
+                <div class="field mb-3">
+                    <label>Reste Année Dernière</label>
+                    <input type="number" pInputText [(ngModel)]="editRevenu.resteAnneeDerniere" /> <!-- 🆕 -->
+                </div>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="footer">
+            <button pButton label="Annuler" icon="pi pi-times" class="p-button-text" (click)="showEditDialog = false"></button>
+            <button pButton label="Enregistrer" icon="pi pi-check" class="p-button-text" (click)="modifierRevenu()"></button>
+        </ng-template>
+    </p-dialog>
+
+    <p-toast></p-toast>
+    <p-confirmDialog></p-confirmDialog>
+</div>

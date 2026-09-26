@@ -1,0 +1,114 @@
+<div class="card p-4 shadow-2 surface-card border-round-xl">
+
+    <p-toolbar class="mb-4">
+        <ng-template pTemplate="left">
+            <h4 class="m-0">Gestion des Pressons</h4>
+        </ng-template>
+        <ng-template pTemplate="right">
+            <button pButton icon="pi pi-plus" class="p-button-success" label="Ajouter" (click)="ouvrirAjouterPresson()"></button>
+            <button pButton icon="pi pi-trash" class="p-button-danger ms-2" label="Supprimer"
+                    [disabled]="!selectedPressons.length"
+                    (click)="supprimerPressonsSelectionnees()"></button>
+            <!-- 🔹 Bouton Imprimer -->
+            <button pButton icon="pi pi-print" class="p-button-info ms-2" label="Imprimer"
+                    (click)="imprimerPressons()"></button>
+        </ng-template>
+    </p-toolbar>
+
+    <!-- 🔹 Total général -->
+    <div class="mb-3">
+        <label>Total général :</label>
+        <input type="number" pInputText [value]="totalGeneral" disabled />
+    </div>
+
+    <p-table #dt [value]="pressons" [(selection)]="selectedPressons"
+             dataKey="id" [paginator]="true" [rows]="5" [rowsPerPageOptions]="[5,10,20]"
+             [responsiveLayout]="'scroll'" [globalFilterFields]="['nomComplet']" selectionMode="multiple">
+
+        <ng-template pTemplate="caption">
+            <div class="caption-container">
+                <span class="text-lg font-semibold">Liste des Pressons</span>
+                <span class="p-input-icon-left search-wrapper">
+                    <i class="pi pi-search"></i>
+                    <input pInputText type="text" placeholder="Rechercher..." (input)="onGlobalFilter($event)" style="width:200px" />
+                </span>
+            </div>
+        </ng-template>
+
+        <ng-template pTemplate="header">
+            <tr>
+                <th style="width:3rem"><p-tableHeaderCheckbox></p-tableHeaderCheckbox></th>
+                <th>Nom complet</th>
+                <th>Total</th>
+                <th>Actions</th>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-presson>
+            <tr>
+                <td><p-tableCheckbox [value]="presson"></p-tableCheckbox></td>
+                <td>{{ presson.nomComplet }}</td>
+                <td>{{ getTotalPresson(presson) }}</td>
+                <td>
+                    <button pButton icon="pi pi-pencil" class="p-button-rounded p-button-warning me-2"
+                            (click)="ouvrirModifierPresson(presson)"></button>
+                    <button pButton icon="pi pi-trash" class="p-button-rounded p-button-danger"
+                            (click)="supprimerPresson(presson.id, presson.nomComplet)"></button>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+
+    <!-- 🔹 MODALE AJOUT -->
+    <p-dialog header="Nouvelle Presson" [(visible)]="showAddDialog" [modal]="true" [style]="{ width:'500px' }" [closable]="false">
+        <ng-template pTemplate="content">
+            <div class="p-fluid">
+                <div class="field mb-3">
+                    <label>Nom complet</label>
+                    <input pInputText [(ngModel)]="newPresson.nomComplet" required />
+                </div>
+
+                <div class="field mb-3">
+                    <label>Paiements</label>
+                    <div *ngFor="let p of newPresson.paiements; let i = index" class="flex align-items-center mb-2">
+                        <span style="width:60px">{{ p.mois }}</span>
+                        <input type="number" pInputText [(ngModel)]="newPresson.paiements[i].montant" class="mr-2" style="width:100px" />
+                        <input type="date" pInputText [(ngModel)]="newPresson.paiements[i].datePaiement" style="flex:1" />
+                    </div>
+                </div>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="footer">
+            <button pButton label="Annuler" icon="pi pi-times" class="p-button-text" (click)="showAddDialog = false"></button>
+            <button pButton label="Enregistrer" icon="pi pi-check" class="p-button-text" (click)="ajouterPresson()"></button>
+        </ng-template>
+    </p-dialog>
+
+    <!-- 🔹 MODALE MODIFICATION -->
+    <p-dialog header="Modifier Presson" [(visible)]="showEditDialog" [modal]="true" [style]="{ width:'500px' }" [closable]="false">
+        <ng-template pTemplate="content">
+            <div class="p-fluid">
+                <div class="field mb-3">
+                    <label>Nom complet</label>
+                    <input pInputText [(ngModel)]="editPresson.nomComplet" required />
+                </div>
+
+                <div class="field mb-3">
+                    <label>Paiements</label>
+                    <div *ngFor="let p of editPresson.paiements; let i = index" class="flex align-items-center mb-2">
+                        <span style="width:60px">{{ p.mois }}</span>
+                        <input type="number" pInputText [(ngModel)]="editPresson.paiements[i].montant" class="mr-2" style="width:100px" />
+                        <input type="date" pInputText [(ngModel)]="editPresson.paiements[i].datePaiement" style="flex:1" />
+                    </div>
+                </div>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="footer">
+            <button pButton label="Annuler" icon="pi pi-times" class="p-button-text" (click)="showEditDialog = false"></button>
+            <button pButton label="Enregistrer" icon="pi pi-check" class="p-button-text" (click)="modifierPresson()"></button>
+        </ng-template>
+    </p-dialog>
+
+    <p-toast></p-toast>
+    <p-confirmDialog></p-confirmDialog>
+</div>

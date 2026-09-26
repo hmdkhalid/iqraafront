@@ -1,0 +1,146 @@
+<div class="card p-4 shadow-2 surface-card border-round-xl" id="print-section">
+    <h3 class="mb-3">Gestion des Accidents</h3>
+
+    <!-- Toolbar -->
+    <p-toolbar class="mb-3">
+        <ng-template pTemplate="left">
+            <button pButton pRipple icon="pi pi-plus" class="p-button-success mr-2" label="Ajouter" (click)="openNew()"></button>
+            <button pButton pRipple icon="pi pi-trash" class="p-button-danger" label="Supprimer sélection"
+                    [disabled]="!selectedAccidents || selectedAccidents.length === 0" (click)="deleteSelectedAccidents()"></button>
+        </ng-template>
+
+        <ng-template pTemplate="right">
+            <span class="p-input-icon-left mr-2">
+                <i class="pi pi-search"></i>
+                <input pInputText type="text" placeholder="Rechercher..."
+                       (input)="dt.filterGlobal($any($event).target.value, 'contains')" />
+            </span>
+            <button pButton pRipple icon="pi pi-print" class="p-button-info" label="Imprimer" (click)="imprimer()"></button>
+        </ng-template>
+    </p-toolbar>
+
+    <!-- Table -->
+    <p-table #dt [value]="accidents" [(selection)]="selectedAccidents" dataKey="id" [paginator]="true" [rows]="10"
+             [rowsPerPageOptions]="[5,10,20,50]" [responsiveLayout]="'scroll'" selectionMode="multiple"
+             [globalFilterFields]="['nomPersonne','type']" styleClass="p-datatable-gridlines">
+
+        <ng-template pTemplate="header">
+            <tr>
+                <th style="width: 3rem"><p-tableHeaderCheckbox></p-tableHeaderCheckbox></th>
+                <th pSortableColumn="nomPersonne">Nom <p-sortIcon field="nomPersonne"></p-sortIcon></th>
+                <th pSortableColumn="type">Type <p-sortIcon field="type"></p-sortIcon></th>
+                <th pSortableColumn="date">Date <p-sortIcon field="date"></p-sortIcon></th>
+                <th pSortableColumn="montant">Montant <p-sortIcon field="montant"></p-sortIcon></th>
+                <th style="width: 8rem">Actions</th>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-accident>
+            <tr>
+                <td><p-tableCheckbox [value]="accident"></p-tableCheckbox></td>
+                <td>{{ accident.nomPersonne }}</td>
+                <td>{{ accident.type }}</td>
+                <td>{{ accident.date | date:'dd/MM/yyyy' }}</td>
+                <td><span class="font-semibold">{{ (accident.montant || 0) | number:'1.2-2' }} MAD</span></td>
+                <td>
+                    <div class="flex gap-2">
+                        <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-warning p-button-sm"
+                                (click)="editAccident(accident)" title="Modifier"></button>
+                        <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-danger p-button-sm"
+                                (click)="deleteAccident(accident.id!)" [disabled]="!accident.id" title="Supprimer"></button>
+                    </div>
+                </td>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+            <tr>
+                <td colspan="6" class="text-center p-4">
+                    <div>
+                        <i class="pi pi-info-circle text-4xl text-400 mb-3"></i>
+                        <p class="text-600 mb-3">Aucun accident trouvé</p>
+                        <button pButton label="Ajouter le premier accident" class="p-button-sm" (click)="openNew()"></button>
+                    </div>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+
+    <!-- Totaux -->
+    <div class="mt-4 grid">
+        <div class="col-12 md:col-6">
+            <div class="card bg-blue-50 p-3">
+                <div class="flex justify-content-between align-items-center">
+                    <div>
+                        <span class="text-blue-600 font-semibold">Total Montant Accidents</span>
+                        <div class="text-blue-800 font-bold text-xl">{{ totalGeneral | number }}</div>
+                    </div>
+                    <i class="pi pi-wallet text-blue-600 text-3xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 md:col-6">
+            <div class="card bg-purple-50 p-3">
+                <div class="flex justify-content-between align-items-center">
+                    <div>
+                        <span class="text-purple-600 font-semibold">Nombre total d'Accidents</span>
+                        <div class="text-purple-800 font-bold text-xl">{{ accidents.length || 0 }}</div>
+                    </div>
+                    <i class="pi pi-calendar text-purple-600 text-3xl"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dialog -->
+    <p-dialog [header]="isEditMode ? 'Modifier Accident' : 'Ajouter Accident'" [(visible)]="showDialog" [modal]="true"
+              [style]="{width: '500px'}" [closable]="true">
+
+        <div class="p-fluid">
+            <div class="field">
+                <label for="nomPersonne" class="font-semibold">Nom *</label>
+                <input id="nomPersonne" type="text" pInputText [(ngModel)]="newAccident.nomPersonne" required />
+            </div>
+
+            <div class="field">
+                <label for="type" class="font-semibold">Type *</label>
+                <p-dropdown
+                    id="type"
+                    [(ngModel)]="newAccident.type"
+                    [options]="types"
+                    placeholder="Sélectionner un type"
+                    optionLabel="label"
+                    optionValue="value"
+                    required>
+                </p-dropdown>
+            </div>
+
+            <div class="field">
+                <label for="date" class="font-semibold">Date *</label>
+                <p-calendar id="date" [(ngModel)]="newAccident.date" dateFormat="dd/mm/yy" [showIcon]="true"
+                            [monthNavigator]="true" [yearNavigator]="true" yearRange="2000:2100" required>
+                </p-calendar>
+            </div>
+
+            <div class="field">
+                <label for="montant" class="font-semibold">Montant (MAD)</label>
+                <input id="montant" type="number" pInputText [(ngModel)]="newAccident.montant" min="0" step="0.01"
+                       placeholder="0.00" />
+            </div>
+        </div>
+
+        <ng-template pTemplate="footer">
+            <div class="flex justify-content-end gap-2">
+                <button pButton label="Annuler" class="p-button-text p-button-secondary" (click)="hideDialog()"></button>
+                <button pButton label="Enregistrer" icon="pi pi-check" class="p-button-primary"
+                        (click)="saveAccident()" [disabled]="!newAccident.nomPersonne || !newAccident.type || !newAccident.date">
+                </button>
+            </div>
+        </ng-template>
+    </p-dialog>
+
+    <!-- Toast + Confirm -->
+    <p-toast position="top-right"></p-toast>
+    <p-confirmDialog></p-confirmDialog>
+</div>

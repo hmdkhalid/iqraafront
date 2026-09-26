@@ -1,0 +1,114 @@
+<div class="card p-4 shadow-2 surface-card border-round-xl">
+
+    <p-toolbar class="mb-4">
+        <ng-template pTemplate="left">
+            <h4 class="m-0">Gestion des Réparations École</h4>
+        </ng-template>
+        <ng-template pTemplate="right">
+            <button pButton icon="pi pi-plus" class="p-button-success" label="Ajouter" (click)="showAddDialog = true"></button>
+            <button pButton icon="pi pi-trash" class="p-button-danger ms-2" label="Supprimer"
+                    [disabled]="!selectedReparations.length"
+                    (click)="supprimerReparationsSelectionnees()"></button>
+            <button pButton icon="pi pi-print" class="p-button-info ms-2" label="Imprimer"
+                    (click)="imprimer()"></button>
+        </ng-template>
+    </p-toolbar>
+
+    <!-- 🔹 Total général -->
+    <div class="mb-3">
+        <label>Total général :</label>
+        <input type="number" pInputText [value]="totalGeneral" disabled />
+    </div>
+
+    <p-table #dt [value]="reparations" [(selection)]="selectedReparations"
+             dataKey="id" [paginator]="true" [rows]="5" [rowsPerPageOptions]="[5,10,20]"
+             [responsiveLayout]="'scroll'" [globalFilterFields]="['type']" selectionMode="multiple">
+
+        <ng-template pTemplate="caption">
+            <div class="caption-container">
+                <span class="text-lg font-semibold">Liste des réparations</span>
+                <span class="p-input-icon-left search-wrapper">
+                    <i class="pi pi-search"></i>
+                    <input pInputText type="text" placeholder="Rechercher..." (input)="onGlobalFilter($event)" style="width:200px" />
+                </span>
+            </div>
+        </ng-template>
+
+        <ng-template pTemplate="header">
+            <tr>
+                <th style="width:3rem"><p-tableHeaderCheckbox></p-tableHeaderCheckbox></th>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Prix</th>
+                <th>Actions</th>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-rep>
+            <tr>
+                <td><p-tableCheckbox [value]="rep"></p-tableCheckbox></td>
+                <td>{{ rep.date | date:'dd/MM/yyyy' }}</td>
+                <td>{{ rep.type }}</td>
+                <td>{{ rep.prix }}</td>
+                <td>
+                    <button pButton icon="pi pi-pencil" class="p-button-rounded p-button-warning me-2"
+                            (click)="ouvrirModifierReparation(rep)"></button>
+                    <button pButton icon="pi pi-trash" class="p-button-rounded p-button-danger"
+                            (click)="supprimerReparation(rep.id, rep.type)"></button>
+                </td>
+            </tr>
+        </ng-template>
+
+    </p-table>
+
+    <!-- MODALE AJOUT -->
+    <p-dialog header="Nouvelle Réparation" [(visible)]="showAddDialog" [modal]="true" [style]="{ width:'400px' }" [closable]="false">
+        <ng-template pTemplate="content">
+            <div class="p-fluid">
+                <div class="field mb-3">
+                    <label>Date</label>
+                    <input type="date" pInputText [(ngModel)]="newReparation.date" required />
+                </div>
+                <div class="field mb-3">
+                    <label>Type</label>
+                    <input pInputText [(ngModel)]="newReparation.type" required />
+                </div>
+                <div class="field mb-3">
+                    <label>Prix</label>
+                    <input type="number" pInputText [(ngModel)]="newReparation.prix" />
+                </div>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="footer">
+            <button pButton label="Annuler" icon="pi pi-times" class="p-button-text" (click)="showAddDialog = false"></button>
+            <button pButton label="Enregistrer" icon="pi pi-check" class="p-button-text" (click)="ajouterReparation()"></button>
+        </ng-template>
+    </p-dialog>
+
+    <!-- MODALE MODIFICATION -->
+    <p-dialog header="Modifier Réparation" [(visible)]="showEditDialog" [modal]="true" [style]="{ width:'400px' }" [closable]="false">
+        <ng-template pTemplate="content">
+            <div class="p-fluid">
+                <div class="field mb-3">
+                    <label>Date</label>
+                    <input type="date" pInputText [(ngModel)]="editReparation.date" required />
+                </div>
+                <div class="field mb-3">
+                    <label>Type</label>
+                    <input pInputText [(ngModel)]="editReparation.type" required />
+                </div>
+                <div class="field mb-3">
+                    <label>Prix</label>
+                    <input type="number" pInputText [(ngModel)]="editReparation.prix" />
+                </div>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="footer">
+            <button pButton label="Annuler" icon="pi pi-times" class="p-button-text" (click)="showEditDialog = false"></button>
+            <button pButton label="Enregistrer" icon="pi pi-check" class="p-button-text" (click)="modifierReparation()"></button>
+        </ng-template>
+    </p-dialog>
+
+    <p-toast></p-toast>
+    <p-confirmDialog></p-confirmDialog>
+</div>

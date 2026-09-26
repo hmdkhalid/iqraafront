@@ -1,0 +1,136 @@
+<div class="card p-4 shadow-2 surface-card border-round-xl">
+
+    <p-toolbar class="mb-4">
+        <ng-template pTemplate="left">
+            <h4 class="m-0">Gestion des Téléphones</h4>
+        </ng-template>
+        <ng-template pTemplate="right">
+            <button pButton icon="pi pi-plus" class="p-button-success" label="Ajouter" (click)="showAddDialog=true"></button>
+            <button pButton icon="pi pi-trash" class="p-button-danger ms-2" label="Supprimer"
+                    [disabled]="!selectedTelephones.length"
+                    (click)="supprimerTelephonesSelectionnes()"></button>
+            <button pButton icon="pi pi-print" class="p-button-info ms-2" label="Imprimer"
+                    (click)="imprimer()"></button>
+        </ng-template>
+    </p-toolbar>
+
+    <!-- 🔹 Total général -->
+    <div class="mb-3">
+        <label>Total général :</label>
+        <input type="number" pInputText [value]="totalGeneral" disabled />
+    </div>
+
+    <p-table #dt [value]="telephones" [(selection)]="selectedTelephones"
+             dataKey="id" [paginator]="true" [rows]="5" [rowsPerPageOptions]="[5,10,20]"
+             [responsiveLayout]="'scroll'" [globalFilterFields]="['numero']" selectionMode="multiple">
+
+        <ng-template pTemplate="caption">
+            <div class="caption-container">
+                <span class="text-lg font-semibold">Liste des Téléphones</span>
+                <span class="p-input-icon-left search-wrapper">
+                    <i class="pi pi-search"></i>
+                    <input pInputText type="text" placeholder="Rechercher..." (input)="onGlobalFilter($event)" style="width:200px" />
+                </span>
+            </div>
+        </ng-template>
+
+        <ng-template pTemplate="header">
+            <tr>
+                <th style="width:3rem"><p-tableHeaderCheckbox></p-tableHeaderCheckbox></th>
+                <th>Numéro</th>
+                <th>Total</th>
+                <th>Actions</th>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-telephone>
+            <tr>
+                <td><p-tableCheckbox [value]="telephone"></p-tableCheckbox></td>
+                <td>{{ telephone.numero }}</td>
+                <td>{{ getTotalTelephone(telephone) }}</td>
+                <td>
+                    <button pButton icon="pi pi-pencil" class="p-button-rounded p-button-warning me-2"
+                            (click)="ouvrirModifierTelephone(telephone)"></button>
+                    <button pButton icon="pi pi-trash" class="p-button-rounded p-button-danger"
+                            (click)="supprimerTelephone(telephone.id)"></button>
+                </td>
+            </tr>
+        </ng-template>
+
+    </p-table>
+
+    <!-- MODALE AJOUT -->
+    <p-dialog header="Nouveau Téléphone" [(visible)]="showAddDialog" [modal]="true" [style]="{ width:'400px' }" [closable]="false">
+        <ng-template pTemplate="content">
+            <div class="p-fluid">
+                <div class="field mb-3">
+                    <label>Numéro</label>
+                    <input pInputText [(ngModel)]="newTelephone.numero" required />
+                </div>
+
+                <div class="field mb-3">
+                    <label>Paiements</label>
+                    <p-table [value]="newTelephone.paiements" responsiveLayout="scroll">
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th>Mois</th>
+                                <th>Date de paiement</th>
+                                <th>Montant</th>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-p>
+                            <tr>
+                                <td>{{ p.mois }}</td>
+                                <td><input type="date" pInputText [(ngModel)]="p.datePaiement" [ngModelOptions]="{standalone:true}" /></td>
+                                <td><input type="number" pInputText [(ngModel)]="p.montant" [ngModelOptions]="{standalone:true}" /></td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="footer">
+            <button pButton label="Annuler" icon="pi pi-times" class="p-button-text" (click)="showAddDialog=false"></button>
+            <button pButton label="Enregistrer" icon="pi pi-check" class="p-button-text" (click)="ajouterTelephone()"></button>
+        </ng-template>
+    </p-dialog>
+
+    <!-- MODALE MODIFICATION -->
+    <p-dialog header="Modifier Téléphone" [(visible)]="showEditDialog" [modal]="true" [style]="{ width:'400px' }" [closable]="false">
+        <ng-template pTemplate="content">
+            <div class="p-fluid">
+                <div class="field mb-3">
+                    <label>Numéro</label>
+                    <input pInputText [(ngModel)]="editTelephone.numero" required />
+                </div>
+
+                <div class="field mb-3">
+                    <label>Paiements</label>
+                    <p-table [value]="editTelephone.paiements" responsiveLayout="scroll">
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th>Mois</th>
+                                <th>Date de paiement</th>
+                                <th>Montant</th>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-p>
+                            <tr>
+                                <td>{{ p.mois }}</td>
+                                <td><input type="date" pInputText [(ngModel)]="p.datePaiement" [ngModelOptions]="{standalone:true}" /></td>
+                                <td><input type="number" pInputText [(ngModel)]="p.montant" [ngModelOptions]="{standalone:true}" /></td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="footer">
+            <button pButton label="Annuler" icon="pi pi-times" class="p-button-text" (click)="showEditDialog=false"></button>
+            <button pButton label="Enregistrer" icon="pi pi-check" class="p-button-text" (click)="modifierTelephone()"></button>
+        </ng-template>
+    </p-dialog>
+
+    <p-toast></p-toast>
+    <p-confirmDialog></p-confirmDialog>
+</div>
